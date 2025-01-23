@@ -1,0 +1,37 @@
+version: 1
+
+before:
+  hooks:
+    # You may remove this if you don't use go modules.
+    - go mod tidy
+
+builds:
+  - main: ./bin/blinkogram
+    binary: blinkogram
+    goos:
+      - linux
+      - darwin
+      - windows
+
+archives:
+  - format: tar.gz
+    # this name template makes the OS and Arch compatible with the results of `uname`.
+    name_template: >-
+      blinkogram_{{ .Tag }}_{{ .Os }}_{{ .Arch }}
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+
+checksum:
+  disable: true
+
+release:
+  draft: true
+  replace_existing_draft: true
+  replace_existing_artifacts: true
+  mode: replace
+  skip_upload: false
