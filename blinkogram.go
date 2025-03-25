@@ -93,6 +93,7 @@ func (s *Service) Start(ctx context.Context) {
 func (s *Service) createMemo(content string) (BlinkoItem, error) {
 	item := BlinkoItem{
 		Content: content,
+		Type: 		 0,
 	}
 	memo, err := s.client.UpsertBlinko(item)
 	if err != nil {

@@ -44,7 +44,7 @@ type FileUploadResponse struct {
 
 type BlinkoItem struct {
 	ID          int        `json:"id,omitempty"`
-	Type        int        `json:"type,omitempty"`
+	Type        int        `json:"type"`
 	Content     string     `json:"content"`
 	Attachments []FileInfo `json:"attachments,omitempty"`
 	IsTop       bool       `json:"isTop"`
