@@ -258,7 +258,7 @@ func (s *Service) startHandler(ctx context.Context, b *bot.Bot, m *models.Update
 	accessToken := strings.TrimPrefix(m.Message.Text, "/start ")
 
 	s.client.UpdateToken(accessToken)
-	_, err := s.client.GetNoteList("")
+	userInfo, err := s.client.GetUserDetail()
 
 	if err != nil {
 		b.SendMessage(ctx, &bot.SendMessageParams{
@@ -271,7 +271,7 @@ func (s *Service) startHandler(ctx context.Context, b *bot.Bot, m *models.Update
 	s.store.SetUserAccessToken(userID, accessToken)
 	b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID: m.Message.Chat.ID,
-		Text:   fmt.Sprintf("Hello %s!", "user.Nickname"),
+		Text:   fmt.Sprintf("Hello %s!", userInfo.Nickname),
 	})
 }
 

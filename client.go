@@ -11,11 +11,12 @@ import (
 )
 
 const (
-	apiPathNoteUpsert  = "/api/v1/note/upsert"
-	apiPathNoteDetail  = "/api/v1/note/detail"
-	apiPathFileUpload  = "/api/file/upload"
-	apiPathGetNoteList = "/api/v1/note/list"
-	apiPathShareNote   = "/api/v1/note/share"
+	apiPathNoteUpsert    = "/api/v1/note/upsert"
+	apiPathNoteDetail    = "/api/v1/note/detail"
+	apiPathFileUpload    = "/api/file/upload"
+	apiPathGetNoteList   = "/api/v1/note/list"
+	apiPathShareNote     = "/api/v1/note/share"
+	apiPathGetUserDetail = "/api/v1/user/detail"
 )
 
 type BlinkoError struct {
@@ -54,6 +55,12 @@ type BlinkoClient struct {
 	baseURL    string
 	token      string
 	httpClient *http.Client
+}
+
+type UserInfo struct {
+	ID       int    `json:"id"`
+	Username string `json:"name"`
+	Nickname string `json:"nickName"`
 }
 
 func NewBlinkoClient(baseURL string) *BlinkoClient {
@@ -256,4 +263,23 @@ func (c *BlinkoClient) ShareNote(memoID int, isShare bool) error {
 	}
 
 	return nil
+}
+
+// 获取用户信息
+func (c *BlinkoClient) GetUserDetail() (UserInfo, error) {
+	url := c.baseURL + apiPathGetUserDetail
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return UserInfo{}, err
+	}
+	resp, err := c.doRequest(req)
+	if err != nil {
+		return UserInfo{}, err
+	}
+	var userDetail UserInfo
+	err = json.Unmarshal(resp, &userDetail)
+	if err != nil {
+		return UserInfo{}, err
+	}
+	return userDetail, nil
 }
