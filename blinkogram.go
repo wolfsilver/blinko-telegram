@@ -93,7 +93,7 @@ func (s *Service) Start(ctx context.Context) {
 func (s *Service) createMemo(content string) (BlinkoItem, error) {
 	item := BlinkoItem{
 		Content: content,
-		Type: 		 0,
+		Type:    0,
 	}
 	memo, err := s.client.UpsertBlinko(item)
 	if err != nil {
@@ -221,9 +221,13 @@ func (s *Service) handler(ctx context.Context, b *bot.Bot, m *models.Update) {
 	var memo BlinkoItem
 	memo, err := s.handleMemoCreation(m, content)
 	if err != nil {
+		errMessage := "Failed to create memo"
+		if isUnauthorizedError(err) {
+			errMessage = "Access token expired or invalid. Please run /start <access_token> again."
+		}
 		b.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID: message.Chat.ID,
-			Text:   "Failed to create memo",
+			Text:   errMessage,
 		})
 		return
 	}
@@ -506,6 +510,21 @@ func (s *Service) sendError(b *bot.Bot, chatID int64, err error) {
 		ChatID: chatID,
 		Text:   fmt.Sprintf("Error: %s", err.Error()),
 	})
+}
+
+func isUnauthorizedError(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	if blinkoErr, ok := errors.Cause(err).(*BlinkoError); ok {
+		if blinkoErr.StatusCode == http.StatusUnauthorized {
+			return true
+		}
+		return strings.Contains(strings.ToUpper(blinkoErr.Message), "UNAUTHORIZED")
+	}
+
+	return false
 }
 
 func formatContent(content string, contentEntities []models.MessageEntity) string {
